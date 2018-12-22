@@ -8,27 +8,34 @@
     <title>Socket.IO chat</title>
 </head>
 <body>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-        $(() => {
-            const socket = io();
-            $('form').submit(function(){
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
-             });
-            //  io.emit('some event', { for: 'everyone' });
-            socket.on('chat message', (msg) => {
-                $('#messages').append($('<li>').text(msg));
-            });
-
-        });
-    
-    </script>
     <ul id="messages"></ul>
     <form action="">
-        <input id="m" autocomplete="off"><button>Send</button>
+      <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+        $(() => {
+            let socket = io();
+            $('form').submit(() => {
+                /*
+                 When you submit the form emit an event called chat message
+                which should match the event name setup in the backend
+                and send the value of the input which will be received in
+                the backend and then display it.
+                */ 
+                socket.emit('chat message', $('#m').val());
+                // After sending the data empty the input field
+                $('#m').val('');
+                // Exit
+                return false;
+            });
+            // If the chat message is triggered in the backend receive the value
+            socket.on('chat message', (msg) => {
+                // Add the value to the page within an LI element
+                $('#messages').append($('<li>').text(msg));
+            });
+        });
+    </script>
 </body>
 </html>
