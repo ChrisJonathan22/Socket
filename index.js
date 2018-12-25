@@ -24,10 +24,14 @@ io.on('connection', (socket) => {
         // Log the value
         console.log(`message: ${msg}`);
     });
-    // On disconnection, log a message with the socket id
+    // On disconnection, log a message with the socket.client.id
     socket.on('disconnect', () => {
         console.log('a user is disconnected', socket.client.id);
+        // On disconnection send the socket.client.id to the client side
+        io.emit('terminated', socket.client.id);
     });
+    // On connection send the socket.client.id to the client side
+    io.emit('connected', socket.client.id);
 });
 
 http.listen(port, () => {
