@@ -155,7 +155,21 @@ $(() => {
     'Toshie',
     'Junko'];
   
+    // When a user clicks inside the input field, show the element with an id of typing.
+    $('#m').click(()=> {
+        $('#typing').show();
+        // Once the element is shown add the text below.
+        $('#typing').text("a user is typing...");
+    });
+
+    // When the user clicks outside the input field, hide the element with an id of typing.
+    $('#m').blur(() => {
+        $('#typing').hide();
+    });
+
     $('form').submit(() => {
+        // When a user submits his or her message, hide the element with an id of typing.
+        $('#typing').hide();
         // Generate a random number between 1 & 152.
        let randomNumber = Math.floor(Math.random() * 152) + 1;
         // Log the random number.   
@@ -179,6 +193,7 @@ $(() => {
         // Add the value to the page within an LI element.
         $('#messages').append($('<li>').text(msg));
     });
+    
     // When connected receive the socket.client.id and append it.
     socket.on('connected', (user) => {
         $('#messages').append($('<li>').text(`Connected user: ${user}`));
