@@ -1,11 +1,16 @@
+/* Styles for every element on the page */
 * { 
     margin: 0;
     padding: 0;
     box-sizing: border-box; 
 }
+
+/* Body styles */
 body { 
     font: 13px Helvetica, Arial; 
 }
+
+/* Form, input, button styles */
 form { 
     background: #000; 
     padding: 3px; 
@@ -24,14 +29,52 @@ form button {
     border: none; 
     padding: 10px; 
 }
+
+/* Messages styles */
+
 #messages { 
     list-style-type: none; 
     margin: 0; 
     padding: 0; 
+    width: 45%;
+    float: left;
 }
 #messages li { 
-    padding: 5px 10px; 
+    padding: 5px 10px;
 }
 #messages li:nth-child(odd) { 
-    background: #eee; 
+    background: #eee;
+}
+
+/* Online section styles */
+
+#online {
+    width: 45%;
+    height: auto;
+    background-color: white;
+    border: 1px black solid;
+    float: right;
+}
+
+#online h3 {
+    color: green;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Users styles */
+#users {
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+    float: left;
+    width: 100%;
+}
+
+#users li {
+    padding: 5px 10px;
+    background-color: lightgreen;
+    color: black;
+    border: 1px black dashed;
 }

@@ -155,7 +155,8 @@ $(() => {
     'Toshie',
     'Junko'];
   
-    
+    let usersConnected = [];
+
     $('#m').click(()=> {    // When a user clicks inside the input field, show the element with an id of typing.  
         
         socket.emit('typing', "a user is typing...");   // Trigger the event and pass in the value.
@@ -168,6 +169,9 @@ $(() => {
     });
 
     socket.on('typing', (who) => {  // Create an event for when a user types.
+
+        $('#typing').show();    // When the user starts typing show the text.
+
         $('#typing').text(who);     // Receive the value sent and add or replace the content of #typing with the value received.
     });
 
@@ -204,6 +208,10 @@ $(() => {
     
     socket.on('connected', (user) => {  // Create an event called connected which receives user.
 
+        let randomNumber = Math.floor(Math.random() * 152) + 1; // Generate a random number.
+
+        $('#users').append($('<li>').text(names[randomNumber])); // Use the random number to pick a name and append the name to the element with an id of users.
+        
         $('#messages').append($('<li>').text(`Connected user: ${user}`));   // Receive user = socket.client.id and append it.
     });
     
