@@ -3,6 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = 3000;
+const util = require('util');
 
 // This is an array of names which will be used as nicknames for every new message and connected users. The names will be picked by random.
 let names = ['Allison',
@@ -158,7 +159,7 @@ let names = ['Allison',
     'Toshie',
     'Junko'];
 
-let currentUser;    // This is where the current user will be stored. 
+let users = {}; // This is where each connected user will be stored.
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
 
@@ -168,39 +169,44 @@ app.get('/', (req, res) => {    // Create a route which responds to Get requests
 });
 
 io.on('connection', (socket) => {   // When a connection has been established take in socket.
-    console.log('a user is connected', socket.client.id);   // On connection log a message with the socket id.
+
+    console.log('a user is connected', users.uniqueSocket);   // On connection log a message with the socket id.
+
+    let uniqueSocket = socket.client.id;    // Store the unique socket.client.id .
+    let randomNumber = Math.floor(Math.random() * 152) + 1; // Generate a random number.
+    
+    users.uniqueSocket = names[randomNumber];   // Add the uniqueSocket to the object users as  property and use the random name as the value.
+    console.log(users.uniqueSocket);
+    
+    socket.broadcast.emit('connected', users.uniqueSocket);     // On connection send the socket.client.id to the client side.
 
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
-        io.emit('chat message', `${names[currentUser]}${msg}`);   // Trigger the chat message event and pass in the value received.
+        socket.broadcast.emit('chat message', `${users.uniqueSocket} ${msg}`);   // Trigger the chat message event and pass in the value received + a user.
         
         console.log(`message: ${msg}`); // Log the value.
-        console.log(names[currentUser]);
+        console.log(socket.client.id);
+        console.log(util.inspect(users, {showHidden: false, depth: null}));
+        
         
     });
 
-    
-    socket.on('disconnect', () => { // On disconnection, log a message with the socket.client.id .
-
-        console.log('a user is disconnected', socket.client.id);
-
-        io.emit('terminated', names[currentUser]);    // On disconnection send the socket.client.id to the client side.
-    });
-
-    currentUser = Math.floor(Math.random() * 152) + 1; // Generate a random number.
-
-    io.emit('connected', names[currentUser]);     // On connection send the socket.client.id to the client side.
-
-
     socket.on('typing', (who) => {  // When a user types pass in who
-        io.emit('typing', who);     // Trigger the event and receive who which will be a string "a user is typing..." .
+        socket.broadcast.emit('typing', who);     // Trigger the event and receive who which will be a string "a user is typing..." .
         console.log(who);
     });
 
 
     socket.on('notTyping', (who) => {   // When a user stops typing pass in who.
-        io.emit('notTyping', who);      // Trigger the event and receive who which will be an empty string.
+        socket.broadcast.emit('notTyping', who);      // Trigger the event and receive who which will be an empty string.
         console.log(who, 'user no longer typing...');
+    });
+
+    socket.on('disconnect', () => { // On disconnection, log a message with the socket.client.id .
+
+        console.log('a user is disconnected', users.uniqueSocket);
+
+        socket.broadcast.emit('terminated', users.uniqueSocket);    // On disconnection send the socket.client.id to the client side.
     });
 });
 

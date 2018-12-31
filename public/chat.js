@@ -26,10 +26,6 @@ $(() => {
 
     $('form').submit(() => {    // When a user submits his or her message, hide the element with an id of typing.
         $('#typing').hide();
-
-       let randomNumber = Math.floor(Math.random() * 152) + 1;  // Generate a random number between 1 & 152.
-    
-       console.log(randomNumber);   // Log the random number.   
        
        /*
          When you submit the form trigger an event called chat message
