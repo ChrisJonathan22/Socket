@@ -160,7 +160,7 @@ let names = ['Allison',
     'Junko'];
 
 let users = {list: []}; // This is where each connected user will be stored.
-let latestUser;
+let latestUser; //  This is where the last connected user will be stored.
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
 
