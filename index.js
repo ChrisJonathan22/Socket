@@ -159,7 +159,8 @@ let names = ['Allison',
     'Toshie',
     'Junko'];
 
-let users = {}; // This is where each connected user will be stored.
+let users = {list: []}; // This is where each connected user will be stored.
+let latestUser;
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
 
@@ -170,25 +171,33 @@ app.get('/', (req, res) => {    // Create a route which responds to Get requests
 
 io.on('connection', (socket) => {   // When a connection has been established take in socket.
 
-    console.log('a user is connected', users.uniqueSocket);   // On connection log a message with the socket id.
-
-    let uniqueSocket = socket.client.id;    // Store the unique socket.client.id .
     let randomNumber = Math.floor(Math.random() * 152) + 1; // Generate a random number.
     
-    users.uniqueSocket = names[randomNumber];   // Add the uniqueSocket to the object users as  property and use the random name as the value.
-    console.log(users.uniqueSocket);
+    users.list.push({[socket.client.id]: names[randomNumber]});   // Add the unique socket.client.id to the array list within the object users as a property and use the random name as the value.
+
+    latestUser = users.list[users.list.length - 1][socket.client.id];    // Store the latest connected user.
+
+    console.log('a user is connected', latestUser);   // On connection log a message with the latest connected user.
     
-    socket.broadcast.emit('connected', users.uniqueSocket);     // On connection send the socket.client.id to the client side.
+    socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
 
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
-        socket.broadcast.emit('chat message', `${users.uniqueSocket} ${msg}`);   // Trigger the chat message event and pass in the value received + a user.
-        
-        console.log(`message: ${msg}`); // Log the value.
-        console.log(socket.client.id);
-        console.log(util.inspect(users, {showHidden: false, depth: null}));
-        
-        
+        // Loop through the users.list array.
+        for(let i = 0; i < users.list.length; i++) {
+            if(users.list[i].hasOwnProperty(socket.client.id) == true){ // If one of the users.list item(object) has a property matching the unique socket.client.id .
+
+                socket.broadcast.emit('chat message', `${users.list[i][socket.client.id]} ${msg}`);   // Trigger the chat message event and pass in the value received + a user which will be the value from the matched property.
+
+                console.log(users.list[i][socket.client.id]);   // Log the user name matched.
+
+                console.log(`${users.list[i][socket.client.id]}${msg}`); // Log the value.
+            }
+            else {  // If there aren't any matches log the message below.
+                console.log("No match!");                
+            }
+        }        
+        console.log(util.inspect(users.list, {showHidden: false, depth: null}));    // Log the array of connected users.
     });
 
     socket.on('typing', (who) => {  // When a user types pass in who
@@ -202,14 +211,12 @@ io.on('connection', (socket) => {   // When a connection has been established ta
         console.log(who, 'user no longer typing...');
     });
 
-    socket.on('disconnect', () => { // On disconnection, log a message with the socket.client.id .
-
-        console.log('a user is disconnected', users.uniqueSocket);
-
-        socket.broadcast.emit('terminated', users.uniqueSocket);    // On disconnection send the socket.client.id to the client side.
+    socket.on('disconnect', () => { // On disconnection, log a message with the disconnected user's name.
+        console.log('a user is disconnected', latestUser);
+        socket.broadcast.emit('terminated', latestUser);    // On disconnection send the disconnected user's name to the client side.
     });
 });
 
-http.listen(port, () => {
+http.listen(port, () => {   // Start the server and listen on port: 3000.
     console.log(`listening on port: ${port}`); 
 });
