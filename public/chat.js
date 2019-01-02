@@ -47,15 +47,24 @@ $(() => {
     });
 
     
-    socket.on('connected', (user) => {  // Create an event called connected which receives user.
+    socket.on('connected', (list) => {  // Create an event called connected which receives list which is an array of connected users.
 
-        $('#users').append($('<li>').text(user)); // Use the random number to pick a name and append the name to the element with an id of users.
+        for(let i = 0; i < list.length; i++){   // Loop through the array list.
+
+            let prop = Object.keys(list[i])[0]; //  For each object take the first and only property name and store it inside prop.
+
+            console.log(list[i][prop]); // Each item within the array which are objects, use prop to access the value of each property within each object.
+
+            $('#users').append($('<li>').text(list[i][prop])); // Append each name to the element with an id of users.
         
-        $('#messages').append($('<li>').text(`Connected user: ${user}`));   // Receive user = socket.client.id and append it.
+            $('#messages').append($('<li>').text(`Connected user: ${list[i][prop]}`));   // Append each name to the element with an id of messages.
+        }
     });
     
     socket.on('terminated', (user) => { // Create an event called terminated which receives user.
 
-        $('#messages').append($('<li>').text(`User disconnected: ${user}`));    // Receive user = socket.client.id and append it
+        $('#users li').css("background-color","red");   // For every disconnected user turn the background colour from green to red.
+
+        $('#messages').append($('<li>').text(`User disconnected: ${user}`));    // Receive user = socket.client.id and append it to messages.
     });
 });

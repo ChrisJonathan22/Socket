@@ -159,7 +159,7 @@ let names = ['Allison',
     'Toshie',
     'Junko'];
 
-let users = {list: []}; // This is where each connected user will be stored.
+let users = {list: [], disconnected: []}; // This is where each connected and disconnected users will be stored.
 let latestUser; //  This is where the last connected user will be stored.
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
@@ -179,7 +179,9 @@ io.on('connection', (socket) => {   // When a connection has been established ta
 
     console.log('a user is connected', latestUser);   // On connection log a message with the latest connected user.
     
-    socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
+    // socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
+
+    socket.broadcast.emit('connected', users.list);     // On connection send the list of connected users to the client side which will be added to the list.
 
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
@@ -194,7 +196,7 @@ io.on('connection', (socket) => {   // When a connection has been established ta
                 console.log(`${users.list[i][socket.client.id]}${msg}`); // Log the value.
             }
             else {  // If there aren't any matches log the message below.
-                console.log("No match!");                
+                console.log("No match!");              
             }
         }        
         console.log(util.inspect(users.list, {showHidden: false, depth: null}));    // Log the array of connected users.
@@ -212,8 +214,31 @@ io.on('connection', (socket) => {   // When a connection has been established ta
     });
 
     socket.on('disconnect', () => { // On disconnection, log a message with the disconnected user's name.
-        console.log('a user is disconnected', latestUser);
+        users.disconnected.push(latestUser);    // Add disconnected users to the array disconnected which is inside the object users.
+
+        console.log('a user is disconnected', latestUser);  // Log the latest disconnected user.
         socket.broadcast.emit('terminated', latestUser);    // On disconnection send the disconnected user's name to the client side.
+
+
+        // Loop through the list of connected users and remove any name matching the name of the disconnected user.
+        
+        for(let i = 0; i < users.list; i++) {
+            let prop = Object.keys(users.list[i])[0]; //  For each object take the first and only property name and store it inside prop.
+            
+            // if(users.disconnected[0] == users.list[i][prop]){
+            //     // Remove it from the array list of connected users.
+            //     let index = users.list[i].indexOf();
+            //     let indexStart = index - 1;
+            //     users.list.splice(indexStart, 1);
+            //     console.log("We have a winner!");
+                
+            // }
+            console.log("This is a list of connected users" + users.list[i]);
+            console.log("It works.");
+            
+        }
+
+        
     });
 });
 
