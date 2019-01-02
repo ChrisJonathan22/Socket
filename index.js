@@ -1,165 +1,14 @@
-const express = require('express');
-const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const port = 3000;
-const util = require('util');
+const express = require('express'); // Require Express to this file.
+const app = express();  // Initialise the an Express app.
+const http = require('http').Server(app);   // Require the http module, use the Server method and supply it with app.
+const io = require('socket.io')(http);  // Require Socket.io and supply it with the http server.
+const port = 3000;  // Create a port number.
+const util = require('util');   // Require Util.
+const listOfNames = require('./names'); // Require the file names.js and store it in this variable.
+const names = listOfNames.names;        // Access the names array and store it in this variable.
 
-// This is an array of names which will be used as nicknames for every new message and connected users. The names will be picked by random.
-let names = ['Allison',
-    'Arthur',
-    'Ana',  
-    'Alex',
-    'Arlene',
-    'Alberto',
-    'Barry',
-    'Bertha',
-    'Bill',
-    'Bonnie',
-    'Bret',
-    'Beryl',
-    'Chantal',
-    'Cristobal',
-    'Claudette',
-    'Charley',
-    'Cindy',
-    'Chris',
-    'Dean',
-    'Dolly',
-    'Danny',
-    'Danielle',
-    'Dennis',
-    'Debby',
-    'Erin',
-    'Edouard',
-    'Erika',
-    'Earl',
-    'Emily',
-    'Ernesto',
-    'Felix',
-    'Fay',
-    'Fabian',
-    'Frances',
-    'Franklin',
-    'Florence',
-    'Gabielle',
-    'Gustav',
-    'Grace',
-    'Gaston',
-    'Gert',
-    'Gordon',
-    'Humberto',
-    'Hanna',
-    'Henri',
-    'Hermine',
-    'Harvey',
-    'Helene',
-    'Iris',
-    'Isidore',
-    'Isabel',
-    'Ivan',
-    'Irene',
-    'Isaac',
-    'Jerry',
-    'Josephine',
-    'Juan',
-    'Jeanne',
-    'Jose',
-    'Joyce',
-    'Karen',
-    'Kyle',
-    'Kate',
-    'Karl',
-    'Katrina',
-    'Kirk',
-    'Lorenzo',
-    'Lili',
-    'Larry',
-    'Lisa',
-    'Lee',
-    'Leslie',
-    'Michelle',
-    'Marco',
-    'Mindy',
-    'Maria',
-    'Michael',
-    'Noel',
-    'Nana',
-    'Nicholas',
-    'Nicole',
-    'Nate',
-    'Nadine',
-    'Olga',
-    'Omar',
-    'Odette',
-    'Otto',
-    'Ophelia',
-    'Oscar',
-    'Pablo',
-    'Paloma',
-    'Peter',
-    'Paula',
-    'Philippe',
-    'Patty',
-    'Rebekah',
-    'Rene',
-    'Rose',
-    'Richard',
-    'Rita',
-    'Rafael',
-    'Sebastien',
-    'Sally',
-    'Sam',
-    'Shary',
-    'Stan',
-    'Sandy',
-    'Tanya',
-    'Teddy',
-    'Teresa',
-    'Tomas',
-    'Tammy',
-    'Tony',
-    'Van',
-    'Vicky',
-    'Victor',
-    'Virginie',
-    'Vince',
-    'Valerie',
-    'Wendy',
-    'Wilfred',
-    'Wanda',
-    'Walter',
-    'Wilma',
-    'William',
-    'Kumiko',
-    'Aki',
-    'Miharu',
-    'Chiaki',
-    'Michiyo',
-    'Itoe',
-    'Nanaho',
-    'Reina',
-    'Emi',
-    'Yumi',
-    'Ayumi',
-    'Kaori',
-    'Sayuri',
-    'Rie',
-    'Miyuki',
-    'Hitomi',
-    'Naoko',
-    'Miwa',
-    'Etsuko',
-    'Akane',
-    'Kazuko',
-    'Miyako',
-    'Youko',
-    'Sachiko',
-    'Mieko',
-    'Toshie',
-    'Junko'];
 
-let users = {list: [], disconnected: []}; // This is where each connected and disconnected users will be stored.
+let users = {list: []}; // This is where each connected and disconnected users will be stored.
 let latestUser; //  This is where the last connected user will be stored.
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
@@ -179,9 +28,9 @@ io.on('connection', (socket) => {   // When a connection has been established ta
 
     console.log('a user is connected', latestUser);   // On connection log a message with the latest connected user.
     
-    // socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
+    socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
 
-    socket.broadcast.emit('connected', users.list);     // On connection send the list of connected users to the client side which will be added to the list.
+    // socket.broadcast.emit('connected', users.list);     // On connection send the list of connected users to the client side which will be added to the list.
 
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
@@ -214,31 +63,9 @@ io.on('connection', (socket) => {   // When a connection has been established ta
     });
 
     socket.on('disconnect', () => { // On disconnection, log a message with the disconnected user's name.
-        users.disconnected.push(latestUser);    // Add disconnected users to the array disconnected which is inside the object users.
 
         console.log('a user is disconnected', latestUser);  // Log the latest disconnected user.
         socket.broadcast.emit('terminated', latestUser);    // On disconnection send the disconnected user's name to the client side.
-
-
-        // Loop through the list of connected users and remove any name matching the name of the disconnected user.
-        
-        for(let i = 0; i < users.list; i++) {
-            let prop = Object.keys(users.list[i])[0]; //  For each object take the first and only property name and store it inside prop.
-            
-            // if(users.disconnected[0] == users.list[i][prop]){
-            //     // Remove it from the array list of connected users.
-            //     let index = users.list[i].indexOf();
-            //     let indexStart = index - 1;
-            //     users.list.splice(indexStart, 1);
-            //     console.log("We have a winner!");
-                
-            // }
-            console.log("This is a list of connected users" + users.list[i]);
-            console.log("It works.");
-            
-        }
-
-        
     });
 });
 

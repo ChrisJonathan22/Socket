@@ -47,24 +47,39 @@ $(() => {
     });
 
     
-    socket.on('connected', (list) => {  // Create an event called connected which receives list which is an array of connected users.
+    socket.on('connected', (user) => {  // Create an event called connected which receives list which is an array of connected users.
 
-        for(let i = 0; i < list.length; i++){   // Loop through the array list.
+        // for(let i = 0; i < list.length; i++){   // Loop through the array list.
 
-            let prop = Object.keys(list[i])[0]; //  For each object take the first and only property name and store it inside prop.
+        //     let prop = Object.keys(list[i])[0]; //  For each object take the first and only property name and store it inside prop.
 
-            console.log(list[i][prop]); // Each item within the array which are objects, use prop to access the value of each property within each object.
+        //     console.log(list[i][prop]); // Each item within the array which are objects, use prop to access the value of each property within each object.
 
-            $('#users').append($('<li>').text(list[i][prop])); // Append each name to the element with an id of users.
+        //     $('#users').append($('<li>').text(list[i][prop])); // Append each name to the element with an id of users.
         
-            $('#messages').append($('<li>').text(`Connected user: ${list[i][prop]}`));   // Append each name to the element with an id of messages.
-        }
+        //     $('#messages').append($('<li>').text(`Connected user: ${list[i][prop]}`));   // Append each name to the element with an id of messages.
+        // }
+
+        $('#users').append($('<li>').text(user)); // Append each name to the element with an id of users.
+        
+        $('#messages').append($('<li>').text(`Connected user: ${user}`));   // Append each name to the element with an id of messages.
     });
     
     socket.on('terminated', (user) => { // Create an event called terminated which receives user.
 
-        $('#users li').css("background-color","red");   // For every disconnected user turn the background colour from green to red.
 
+        let children = $('#users').children();  //  Store all child elements (objects) of the element with an id of #users.
+
+        children.each(function (idx, val){  // Loop through each element.
+            console.log($(this)['0'].innerText);    // Log each element's innerText.
+
+            let singleUser = $(this)['0'].innerText;    // Store the each element's innerText.
+
+            if(singleUser == user) {    //  Compare each element's innerText value to the value of the user received.
+
+                    $(this).css("background-color","red");   // If there's a match turn the background colour from green to red.
+                }
+        });
         $('#messages').append($('<li>').text(`User disconnected: ${user}`));    // Receive user = socket.client.id and append it to messages.
     });
 });
