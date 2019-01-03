@@ -46,19 +46,32 @@ $(() => {
         $('#messages').append($('<li>').text(msg)); // Add the value to the page within an LI element.
     });
 
-    
+    /* 
+        If an online user has been clicked on, send a private message to that user and if no user has been clicked on the send a message to everyone.
+        match the name with the unique socket.client.id and then emit the message to that user.
+    */
+   let children = $('#users').children();  //  Store all child elements (objects) of the element with an id of #users.
+   let listElements = $('li');
+
+//    children.each(function (idx, val){  // Loop through each element.
+//     //    console.log($(this)['0'].innerText);    // Log each element's innerText.
+//         $(this)[0].addEventListener('click', () => {
+//             console.log("item clicked");
+            
+//         }, false);
+
+
+//     //    let singleUser = $(this)['0'].innerText;    // Store the each element's innerText.
+
+//    });
+
+    // for(let i = 0; i < listElements.length; i++){
+    //     listElements[i].addEventListener('click', () => {
+    //         console.log('Clicked user!');
+    //     }, false);
+    // }
+
     socket.on('connected', (user) => {  // Create an event called connected which receives list which is an array of connected users.
-
-        // for(let i = 0; i < list.length; i++){   // Loop through the array list.
-
-        //     let prop = Object.keys(list[i])[0]; //  For each object take the first and only property name and store it inside prop.
-
-        //     console.log(list[i][prop]); // Each item within the array which are objects, use prop to access the value of each property within each object.
-
-        //     $('#users').append($('<li>').text(list[i][prop])); // Append each name to the element with an id of users.
-        
-        //     $('#messages').append($('<li>').text(`Connected user: ${list[i][prop]}`));   // Append each name to the element with an id of messages.
-        // }
 
         $('#users').append($('<li>').text(user)); // Append each name to the element with an id of users.
         
@@ -66,7 +79,6 @@ $(() => {
     });
     
     socket.on('terminated', (user) => { // Create an event called terminated which receives user.
-
 
         let children = $('#users').children();  //  Store all child elements (objects) of the element with an id of #users.
 
