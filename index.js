@@ -19,6 +19,7 @@ app.get('/', (req, res) => {    // Create a route which responds to Get requests
 });
 
 io.on('connection', (socket) => {   // When a connection has been established take in socket.
+    console.log(socket.client.id);
 
     let randomNumber = Math.floor(Math.random() * 152) + 1; // Generate a random number.
     
@@ -67,6 +68,8 @@ io.on('connection', (socket) => {   // When a connection has been established ta
         console.log('a user is disconnected', latestUser);  // Log the latest disconnected user.
         socket.broadcast.emit('terminated', latestUser);    // On disconnection send the disconnected user's name to the client side.
     });
+
+    io.to(socket.client.id).emit('chat message', "Hello there friend.");
 });
 
 http.listen(port, () => {   // Start the server and listen on port: 3000.
