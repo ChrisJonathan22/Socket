@@ -31,25 +31,40 @@ io.on('connection', (socket) => {   // When a connection has been established ta
     
     socket.broadcast.emit('connected', latestUser);     // On connection send the latest connected user to the client side which will be added to the end of the list.
 
-    // socket.broadcast.emit('connected', users.list);     // On connection send the list of connected users to the client side which will be added to the list.
-
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
+        if(typeof msg == Object) {  // If msg is an Object do this.
+            // Compare the name with the value of connected users to get the unique socket.client.id and then send them a private message.
+            // Loop through the list of connected users.
+            
+            // for(let i = 0; i < users.list.length; i++) {
+            //     // console.log("They are objects", users.list[i]);
+            //     console.log('It works');
+                
+            // }
+
+            console.log('It works');
+
+        }
+
+        else {  // If msg isn't an Object do this.
+
         // Loop through the users.list array.
         for(let i = 0; i < users.list.length; i++) {
             if(users.list[i].hasOwnProperty(socket.client.id) == true){ // If one of the users.list item(object) has a property matching the unique socket.client.id .
 
-                socket.broadcast.emit('chat message', `${users.list[i][socket.client.id]} ${msg}`);   // Trigger the chat message event and pass in the value received + a user which will be the value from the matched property.
+                socket.broadcast.emit('chat message', `${users.list[i][socket.client.id]}: ${msg}`);   // Trigger the chat message event and pass in the value received + a user which will be the value from the matched property.
 
                 console.log(users.list[i][socket.client.id]);   // Log the user name matched.
 
-                console.log(`${users.list[i][socket.client.id]}${msg}`); // Log the value.
+                console.log(`${users.list[i][socket.client.id]}: ${msg}`); // Log the value.
             }
             else {  // If there aren't any matches log the message below.
                 console.log("No match!");              
             }
         }        
         console.log(util.inspect(users.list, {showHidden: false, depth: null}));    // Log the array of connected users.
+    }
     });
 
     socket.on('typing', (who) => {  // When a user types pass in who

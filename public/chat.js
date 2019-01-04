@@ -2,6 +2,7 @@ $(() => {
     let socket = io();
     socket.connect('http://localhost:3000');
     let targetText; // This is where the clicked element's value will be saved.
+    let targetMessage = {}; // This is where the user name and message will be saved
 
     $('#m').click(()=> {    // When a user clicks inside the input field, show the element with an id of typing.  
         
@@ -48,12 +49,13 @@ $(() => {
         the backend and then display it.
         Add the random number before the message.
         */ 
-        socket.emit('chat message', `: ${$('#m').val()}`);
+        socket.emit('chat message', `${$('#m').val()}`);
 
         }
 
         else {  // If there's a value then do this.
-        socket.emit('chat message', `: ${$('#m').val()}`);
+            targetMessage.targetText = $('#m').val();   // Use the targetText which is a user name as the new object property and set the value to message.
+            socket.emit('chat message', targetMessage);  // Trigger chat message and send the object.
         }
 
         $('#m').val('');    // After sending the data empty the input field.
