@@ -10,6 +10,7 @@ const names = listOfNames.names;        // Access the names array and store it i
 
 let users = {list: []}; // This is where each connected and disconnected users will be stored.
 let latestUser; //  This is where the last connected user will be stored.
+let author; // If the chat message event receives an object this is where the author will be stored.
 
 app.use(express.static('public'));  // Tell express to use the public folder for static files.
 
@@ -33,25 +34,48 @@ io.on('connection', (socket) => {   // When a connection has been established ta
 
     socket.on('chat message', (msg) => {    // If the chat message event has been triggered receive msg.
         
-        if(typeof msg == Object) {  // If msg is an Object do this.
-            // Compare the name with the value of connected users to get the unique socket.client.id and then send them a private message.
-            // Loop through the list of connected users.
+        if(typeof msg == "object") {  // If msg is a type of object do this.
             
-            // for(let i = 0; i < users.list.length; i++) {
-            //     // console.log("They are objects", users.list[i]);
-            //     console.log('It works');
-                
-            // }
+            for(let i = 0; i < users.list.length; i++) {    // Loop through the list of connected users which is an array of objects.
 
-            console.log('It works');
+                if(users.list[i].hasOwnProperty(socket.client.id) == true){ /* 
+                                                                                If one of the users.list item(object)
+                                                                                has a property matching the unique socket.client.id, do this.
+                                                                                In other words, if the connected socket matches one of the sockets
+                                                                                within the list take its value which will be a name.
+                                                                            */
+                    author = users.list[i][socket.client.id];   // Store the value found inside this variable.
+                }
 
+                else {  // If the socket sending the message doesn't match any of the connected users, do this.
+
+                    console.log("No author matched.");  // Log this message.
+                }
+
+                Object.keys(users.list[i]).forEach((key) => {   // Loop through each object and grab its value.
+
+                    if(users.list[i][key] == msg.user) {    /* 
+                                                                Compare the name sent along with the message with the value found within one of the connected users.
+                                                                If there is a match, do this.
+                                                            */
+                        socket.to(Object.getOwnPropertyNames(users.list[i])).emit('chat message', `${author}: ${msg.targetText}`);  // Send a private message to the matching socket.
+
+                        // console.log("This is the property",Object.getOwnPropertyNames(users.list[i]));    
+                        console.log("User found.");
+                    }
+                    else {  // If no users match, the user must be offline.
+
+                        console.log("User not found!"); //
+                    }
+                });
+            }
         }
 
         else {  // If msg isn't an Object do this.
 
-        // Loop through the users.list array.
+        // Loop through the users.list array which contains connected users.
         for(let i = 0; i < users.list.length; i++) {
-            if(users.list[i].hasOwnProperty(socket.client.id) == true){ // If one of the users.list item(object) has a property matching the unique socket.client.id .
+            if(users.list[i].hasOwnProperty(socket.client.id) == true){ // If one of the users.list item(object) has a property matching the unique socket.client.id, do this.
 
                 socket.broadcast.emit('chat message', `${users.list[i][socket.client.id]}: ${msg}`);   // Trigger the chat message event and pass in the value received + a user which will be the value from the matched property.
 

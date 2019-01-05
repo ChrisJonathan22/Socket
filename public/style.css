@@ -63,6 +63,11 @@ form button {
     padding-bottom: 10px;
 }
 
+#online p {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
 /* Users styles */
 #users {
     list-style-type: none; 

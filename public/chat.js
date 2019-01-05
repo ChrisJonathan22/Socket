@@ -1,7 +1,7 @@
 $(() => {
     let socket = io();
     socket.connect('http://localhost:3000');
-    let targetText; // This is where the clicked element's value will be saved.
+    let targetUser; // This is where the clicked element's value will be saved.
     let targetMessage = {}; // This is where the user name and message will be saved
 
     $('#m').click(()=> {    // When a user clicks inside the input field, show the element with an id of typing.  
@@ -31,8 +31,8 @@ $(() => {
             match the name with the unique socket.client.id and then emit the message to that user.
         */   
         $('#users').click(function(e) {
-        targetText = e.target.innerText;
-        console.log(targetText);
+        targetUser = e.target.innerText;
+        console.log(targetUser);
     });
 
     $('form').submit((e) => {    // When a user submits his or her message do this.
@@ -41,21 +41,23 @@ $(() => {
 
         $('#typing').hide();    // Hide the element with an id of typing.
        
-        if(targetText == null || targetText == undefined) { // If targetText is empty or in other words no user has been clicked on do this.
+        if(targetUser == null || targetUser == undefined) { // If targetText is empty or in other words no user has been clicked on do this.
             /*
-         When you submit the form trigger an event called chat message
-        which should match the event name setup in the backend
-        and send the value of the input which will be received in
-        the backend and then display it.
-        Add the random number before the message.
-        */ 
+                When you submit the form trigger an event called chat message
+                which should match the event name setup in the backend
+                and send the value of the input which will be received in
+                the backend and then display it.
+                Add the random number before the message.
+            */ 
         socket.emit('chat message', `${$('#m').val()}`);
 
         }
 
         else {  // If there's a value then do this.
             targetMessage.targetText = $('#m').val();   // Use the targetText which is a user name as the new object property and set the value to message.
+            targetMessage.user = targetUser;
             socket.emit('chat message', targetMessage);  // Trigger chat message and send the object.
+            targetUser = null;  // Change the value of targetUser once the message has been sent.
         }
 
         $('#m').val('');    // After sending the data empty the input field.
